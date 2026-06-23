@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCart } from '../store/slices/cartSlice.js';
 import ProductCard from '../components/ProductCard.jsx';
 import ProductCarousel from '../components/ProductCarousel.jsx';
+import DealsCarousel from '../components/DealsCarousel.jsx';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 
@@ -65,6 +66,11 @@ export default function Home() {
             <div>Free delivery on orders above $49 • 30-day returns</div>
             <div>Big Summer Sale — Up to 60% off on selected items</div>
           </div>
+        </div>
+
+        {/* Deals carousel */}
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <DealsCarousel deals={products.slice(0, 8)} />
         </div>
 
         {/* Hero Section */}
