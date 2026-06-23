@@ -7,8 +7,8 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
   const [idx, setIdx] = useState(0);
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-      <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-lg max-w-4xl w-full p-6">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+      <motion.div initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, ease: 'easeOut' }} className="bg-white rounded-lg max-w-4xl w-full p-6">
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="lg:w-1/2">
             <div className="rounded overflow-hidden">

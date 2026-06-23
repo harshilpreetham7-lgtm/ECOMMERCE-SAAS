@@ -63,9 +63,9 @@ export default function Home() {
         <section className="bg-gradient-to-r from-primary to-secondary text-white py-20 relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -24 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.85, ease: 'easeInOut' }}
               className="flex-1 text-center md:text-left"
             >
               <h1 className="text-5xl font-bold mb-4">Shop with Confidence</h1>
@@ -82,27 +82,27 @@ export default function Home() {
 
             <div className="flex-1 hidden md:flex items-center justify-center relative">
               <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
+                initial={{ scale: 0.92, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.95, ease: 'anticipate' }}
                 className="w-72 h-48 rounded-lg overflow-hidden shadow-2xl bg-white"
               >
                 <img src={fallbackProducts[0].images[0].url} alt="hero-product-1" className="w-full h-full object-cover" />
               </motion.div>
 
               <motion.div
-                initial={{ x: 40, y: -20, opacity: 0 }}
-                animate={{ x: 10, y: -10, opacity: 1 }}
-                transition={{ duration: 0.8 }}
+                initial={{ x: 48, y: -24, opacity: 0 }}
+                animate={{ x: 8, y: -8, opacity: 1 }}
+                transition={{ duration: 1.0, ease: 'easeOut' }}
                 className="w-56 h-40 rounded-lg overflow-hidden shadow-lg absolute right-32 top-8 bg-white"
               >
                 <img src={fallbackProducts[1].images[0].url} alt="hero-product-2" className="w-full h-full object-cover" />
               </motion.div>
 
               <motion.div
-                initial={{ x: -40, y: 20, opacity: 0 }}
-                animate={{ x: -10, y: 10, opacity: 1 }}
-                transition={{ duration: 0.9 }}
+                initial={{ x: -48, y: 24, opacity: 0 }}
+                animate={{ x: -8, y: 8, opacity: 1 }}
+                transition={{ duration: 1.15, ease: 'easeOut' }}
                 className="w-48 h-36 rounded-lg overflow-hidden shadow-lg absolute left-28 bottom-6 bg-white"
               >
                 <img src={fallbackProducts[2].images[0].url} alt="hero-product-3" className="w-full h-full object-cover" />
