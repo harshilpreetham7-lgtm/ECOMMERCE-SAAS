@@ -9,6 +9,7 @@ export default function Register() {
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     role: 'customer',
   });
   const navigate = useNavigate();
@@ -23,10 +24,18 @@ export default function Register() {
     e.preventDefault();
     dispatch(setLoading(true));
 
+    if (formData.password !== formData.confirmPassword) {
+      const msg = 'Passwords do not match';
+      setErrorMsg(msg);
+      dispatch(setError(msg));
+      dispatch(setLoading(false));
+      return;
+    }
+
     try {
-      const response = await authService.register(formData);
-      dispatch(registerSuccess(response));
-      navigate(formData.role === 'vendor' ? '/vendor/dashboard' : '/');
+      await authService.register(formData);
+      // After successful registration, prompt user to login
+      navigate('/login');
     } catch (err) {
       const message = err.message || 'Registration failed';
       setErrorMsg(message);
@@ -76,6 +85,19 @@ export default function Register() {
               type="password"
               name="password"
               value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Confirm Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
               onChange={handleChange}
               required
               className="w-full"

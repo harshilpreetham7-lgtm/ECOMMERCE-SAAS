@@ -1,16 +1,19 @@
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { ShoppingCart, User, LogOut } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Menu, X } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Header() {
+  const [open, setOpen] = useState(false);
   const { user, token } = useSelector((state) => state.auth);
   const { items } = useSelector((state) => state.cart);
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold text-primary">
-          🛍️ E-Commerce SaaS
+        <Link to="/" className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-primary text-white rounded-md flex items-center justify-center">EC</div>
+          <span className="text-2xl font-bold text-primary">E-Commerce SaaS</span>
         </Link>
 
         <nav className="hidden md:flex gap-6">
@@ -67,8 +70,27 @@ export default function Header() {
               </Link>
             </>
           )}
+
+          {/* Mobile menu button */}
+          <button className="md:hidden p-2" onClick={() => setOpen(!open)} aria-label="menu">
+            {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile nav overlay */}
+      {open && (
+        <div className="md:hidden bg-white shadow-lg p-4">
+          <nav className="flex flex-col gap-3">
+            <Link to="/" onClick={() => setOpen(false)}>Home</Link>
+            <Link to="/products" onClick={() => setOpen(false)}>Shop</Link>
+            {user?.role === 'vendor' && <Link to="/vendor/dashboard" onClick={() => setOpen(false)}>Vendor Dashboard</Link>}
+            {user?.role === 'superadmin' && <Link to="/admin/dashboard" onClick={() => setOpen(false)}>Admin Panel</Link>}
+            {!token && <Link to="/login" onClick={() => setOpen(false)}>Login</Link>}
+            {!token && <Link to="/register" onClick={() => setOpen(false)}>Register</Link>}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

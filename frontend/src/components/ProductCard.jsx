@@ -1,16 +1,23 @@
-import { useEffect, useState } from 'react';
-import { productService } from '../services/index.js';
+import { motion } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
 
 export default function ProductCard({ product, onAddToCart }) {
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden">
-      {product.images && product.images[0] && (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.03 }}
+      transition={{ duration: 0.25 }}
+      className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
+    >
+      {product.images && product.images[0] ? (
         <img
           src={product.images[0].url}
           alt={product.name}
           className="w-full h-48 object-cover hover:scale-105 transition"
         />
+      ) : (
+        <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-400">No image</div>
       )}
 
       <div className="p-4">
@@ -48,6 +55,6 @@ export default function ProductCard({ product, onAddToCart }) {
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

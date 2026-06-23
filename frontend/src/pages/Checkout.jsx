@@ -21,6 +21,7 @@ export default function Checkout() {
     zipCode: '',
     country: '',
   });
+  const [paymentMethod, setPaymentMethod] = useState('card');
 
   if (!token) {
     return navigate('/login');
@@ -44,7 +45,7 @@ export default function Checkout() {
     try {
       await orderService.createOrder({
         shippingAddress,
-        paymentMethod: 'stripe',
+        paymentMethod,
       });
 
       dispatch(clearCart());
@@ -52,7 +53,15 @@ export default function Checkout() {
       navigate('/orders');
     } catch (error) {
       console.error('Checkout failed:', error);
-      alert('Checkout failed. Please try again.');
+      // If backend payment fails, prompt a mock success to allow demo
+      const ok = window.confirm('Payment service unavailable — simulate successful payment for demo?');
+      if (ok) {
+        dispatch(clearCart());
+        alert('Demo order placed successfully!');
+        navigate('/orders');
+      } else {
+        alert('Checkout failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -163,6 +172,24 @@ export default function Checkout() {
                         placeholder="United States"
                       />
                     </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg shadow-md p-6 mt-6">
+                  <h2 className="text-xl font-bold mb-4">Payment Options</h2>
+                  <div className="space-y-3">
+                    <label className="flex items-center gap-3">
+                      <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} />
+                      <span>Card (mock)</span>
+                    </label>
+                    <label className="flex items-center gap-3">
+                      <input type="radio" name="payment" value="upi" checked={paymentMethod === 'upi'} onChange={() => setPaymentMethod('upi')} />
+                      <span>UPI (mock)</span>
+                    </label>
+                    <label className="flex items-center gap-3">
+                      <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
+                      <span>Cash on Delivery</span>
+                    </label>
                   </div>
                 </div>
 
