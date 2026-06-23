@@ -8,7 +8,8 @@ export default function ProductCard({ product, onAddToCart, onView }) {
 
   useEffect(() => {
     if (!images || images.length <= 1) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % images.length), 4000);
+    const isMobile = typeof window !== 'undefined' ? window.innerWidth <= 768 : false;
+    const t = setInterval(() => setIdx((i) => (i + 1) % images.length), isMobile ? 5000 : 4000);
     return () => clearInterval(t);
   }, [images]);
 
@@ -26,7 +27,7 @@ export default function ProductCard({ product, onAddToCart, onView }) {
           src={images[idx].url}
           alt={product.name}
           initial={{ scale: 1 }}
-          animate={{ scale: [1, 1.03, 1] }}
+          animate={typeof window !== 'undefined' && window.innerWidth <= 768 ? {} : { scale: [1, 1.03, 1] }}
           transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
           className="w-full h-48 object-cover transition-transform duration-500"
         />

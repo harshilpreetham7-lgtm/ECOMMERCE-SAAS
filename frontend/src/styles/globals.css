@@ -40,3 +40,22 @@ h1, h2, h3, h4 {
   background: var(--brand-accent);
   color: #1a1a1a;
 }
+
+/* Theme presets */
+body[data-theme='flipkart'] {
+  --brand-primary: #2874f0;
+  --brand-accent: #ffcc00;
+  --brand-on-primary: #ffffff;
+}
+
+body[data-theme='amazon'] {
+  --brand-primary: #146eb4; /* darker blue */
+  --brand-accent: #ffd814; /* Amazon yellow */
+  --brand-on-primary: #ffffff;
+}
+
+/* utility mapping to tailwind colors via inline styles where needed */
+.text-brand { color: var(--brand-primary); }
+.bg-brand { background-color: var(--brand-primary); }
+.bg-accent { background-color: var(--brand-accent); }
+.btn-brand { background: var(--brand-primary); color: var(--brand-on-primary); }

@@ -5,13 +5,25 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
   if (!product) return null;
   const images = (product.images && product.images.length > 0) ? product.images : [{ url: 'https://via.placeholder.com/800x600?text=No+Image' }];
   const [idx, setIdx] = useState(0);
+  let touchStartX = 0;
+
+  const handleTouchStart = (e) => {
+    touchStartX = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) < 40) return;
+    if (dx < 0) setIdx((i) => (i + 1) % images.length);
+    else setIdx((i) => (i - 1 + images.length) % images.length);
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
       <motion.div initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, ease: 'easeOut' }} className="bg-white rounded-lg max-w-4xl w-full p-6">
         <div className="flex flex-col lg:flex-row gap-6">
-          <div className="lg:w-1/2">
-            <div className="rounded overflow-hidden">
+            <div className="lg:w-1/2">
+            <div className="rounded overflow-hidden" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
               <img src={images[idx].url} alt={product.name} className="w-full h-96 object-cover rounded" />
             </div>
 

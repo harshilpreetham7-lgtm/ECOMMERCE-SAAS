@@ -1,12 +1,27 @@
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { ShoppingCart, User, LogOut, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [theme, setTheme] = useState('flipkart');
   const { user, token } = useSelector((state) => state.auth);
   const { items } = useSelector((state) => state.cart);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('site-theme');
+    const initial = stored || 'flipkart';
+    setTheme(initial);
+    document.body.setAttribute('data-theme', initial);
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === 'flipkart' ? 'amazon' : 'flipkart';
+    setTheme(next);
+    document.body.setAttribute('data-theme', next);
+    localStorage.setItem('site-theme', next);
+  };
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -70,6 +85,11 @@ export default function Header() {
               </Link>
             </>
           )}
+
+          {/* Theme toggle */}
+          <button onClick={toggleTheme} className="px-3 py-2 border rounded mr-2 hidden md:inline-block">
+            {theme === 'flipkart' ? 'Flipkart' : 'Amazon'}
+          </button>
 
           {/* Mobile menu button */}
           <button className="md:hidden p-2" onClick={() => setOpen(!open)} aria-label="menu">
