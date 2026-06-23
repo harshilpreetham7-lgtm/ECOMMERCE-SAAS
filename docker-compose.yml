@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: ecommerce_mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - ecommerce_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ecommerce_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      NODE_ENV: development
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/ecommerce_saas
+      JWT_SECRET: your_secret_key_here
+      STRIPE_SECRET_KEY: sk_test_your_key
+      STRIPE_WEBHOOK_SECRET: whsec_your_webhook
+      CLOUDINARY_NAME: your_name
+      CLOUDINARY_API_KEY: your_key
+      CLOUDINARY_API_SECRET: your_secret
+      EMAIL_SERVICE: gmail
+      EMAIL_USER: your_email@gmail.com
+      EMAIL_PASS: your_password
+      EMAIL_FROM: noreply@ecommercesaas.com
+      FRONTEND_URL: http://localhost:3000
+    depends_on:
+      - mongodb
+    networks:
+      - ecommerce_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecommerce_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      VITE_API_BASE_URL: http://localhost:5000/api/v1
+      VITE_STRIPE_PUBLIC_KEY: pk_test_your_key
+    depends_on:
+      - backend
+    networks:
+      - ecommerce_network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  ecommerce_network:
+    driver: bridge
