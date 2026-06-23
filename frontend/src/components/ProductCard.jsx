@@ -1,7 +1,17 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
 
 export default function ProductCard({ product, onAddToCart, onView }) {
+  const images = (product.images && product.images.length > 0) ? product.images : [{ url: 'https://via.placeholder.com/600x400?text=No+Image' }];
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    if (!images || images.length <= 1) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % images.length), 3000);
+    return () => clearInterval(t);
+  }, [images]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -10,15 +20,21 @@ export default function ProductCard({ product, onAddToCart, onView }) {
       transition={{ duration: 0.25 }}
       className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
     >
-      {product.images && product.images[0] ? (
-        <img
-          src={product.images[0].url}
+      <div className="relative overflow-hidden">
+        <motion.img
+          key={images[idx].url}
+          src={images[idx].url}
           alt={product.name}
-          className="w-full h-48 object-cover hover:scale-105 transition"
+          initial={{ scale: 1 }}
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ duration: 4, repeat: Infinity }}
+          className="w-full h-48 object-cover transition-transform duration-500"
         />
-      ) : (
-        <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-400">No image</div>
-      )}
+
+        {product.discount > 0 && (
+          <div className="absolute top-2 left-2 bg-accent text-white px-2 py-1 rounded text-sm font-semibold">-{product.discount}%</div>
+        )}
+      </div>
 
       <div className="p-4">
         <h3 className="font-semibold text-lg mb-2 line-clamp-2">{product.name}</h3>
@@ -35,10 +51,10 @@ export default function ProductCard({ product, onAddToCart, onView }) {
               <span className="text-2xl font-bold text-primary">${product.price}</span>
             )}
           </div>
-          {product.discount > 0 && (
-            <span className="bg-danger text-white px-2 py-1 rounded text-sm font-semibold">
-              -{product.discount}%
-            </span>
+          {product.rating > 0 && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-yellow-500 font-semibold">
+              ★ {product.rating.toFixed(1)}
+            </motion.div>
           )}
         </div>
 
@@ -61,6 +77,14 @@ export default function ProductCard({ product, onAddToCart, onView }) {
               <ShoppingCart className="w-4 h-4" />
             </button>
           </div>
+        </div>
+
+        <div className="flex gap-2 mt-3">
+          {images.map((img, i) => (
+            <button key={i} onClick={() => setIdx(i)} className={`w-12 h-12 rounded overflow-hidden border ${i === idx ? 'ring-2 ring-primary' : 'border-gray-200'}`}>
+              <img src={img.url} alt={`thumb-${i}`} className="w-full h-full object-cover" />
+            </button>
+          ))}
         </div>
       </div>
     </motion.div>

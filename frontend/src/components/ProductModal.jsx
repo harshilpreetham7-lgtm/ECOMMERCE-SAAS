@@ -1,22 +1,34 @@
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 
 export default function ProductModal({ product, onClose, onAddToCart }) {
   if (!product) return null;
+  const images = (product.images && product.images.length > 0) ? product.images : [{ url: 'https://via.placeholder.com/800x600?text=No+Image' }];
+  const [idx, setIdx] = useState(0);
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-lg max-w-3xl w-full p-6">
-        <div className="flex justify-between items-start gap-4">
-          <div className="w-1/3">
-            {product.images && product.images[0] ? (
-              <img src={product.images[0].url} alt={product.name} className="w-full h-56 object-cover rounded" />
-            ) : (
-              <div className="w-full h-56 bg-gray-100 rounded" />
-            )}
+      <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-lg max-w-4xl w-full p-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="lg:w-1/2">
+            <div className="rounded overflow-hidden">
+              <img src={images[idx].url} alt={product.name} className="w-full h-96 object-cover rounded" />
+            </div>
+
+            <div className="flex gap-2 mt-3 overflow-x-auto">
+              {images.map((im, i) => (
+                <button key={i} onClick={() => setIdx(i)} className={`w-20 h-20 rounded overflow-hidden border ${i === idx ? 'ring-2 ring-primary' : 'border-gray-200'}`}>
+                  <img src={im.url} alt={`thumb-${i}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex-1">
-            <h3 className="text-2xl font-bold mb-2">{product.name}</h3>
+            <div className="flex justify-between items-start">
+              <h3 className="text-2xl font-bold mb-2">{product.name}</h3>
+              <button onClick={onClose} className="text-gray-500">Close</button>
+            </div>
             <p className="text-gray-600 mb-4">{product.description}</p>
             <div className="mb-4">
               <span className="text-3xl font-bold text-primary">${product.price}</span>
