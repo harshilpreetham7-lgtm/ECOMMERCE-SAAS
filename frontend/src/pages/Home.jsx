@@ -6,6 +6,7 @@ import { setCart } from '../store/slices/cartSlice.js';
 import ProductCard from '../components/ProductCard.jsx';
 import ProductCarousel from '../components/ProductCarousel.jsx';
 import DealsCarousel from '../components/DealsCarousel.jsx';
+import FeaturedCategories from '../components/FeaturedCategories.jsx';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 
@@ -124,6 +125,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <FeaturedCategories categories={categories.filter((c) => c !== 'all')} />
 
         {/* Product Carousel + Filters */}
         <section id="products" className="max-w-7xl mx-auto px-4 py-20">
