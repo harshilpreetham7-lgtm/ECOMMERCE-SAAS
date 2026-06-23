@@ -59,8 +59,16 @@ export default function Home() {
     <>
       <Header />
       <div className="min-h-screen bg-gray-50">
+        {/* Deals strip */}
+        <div className="bg-brand text-white py-2">
+          <div className="max-w-7xl mx-auto px-4 flex items-center justify-between text-sm">
+            <div>Free delivery on orders above $49 • 30-day returns</div>
+            <div>Big Summer Sale — Up to 60% off on selected items</div>
+          </div>
+        </div>
+
         {/* Hero Section */}
-        <section className="bg-gradient-to-r from-primary to-secondary text-white py-20 relative overflow-hidden">
+        <section className="bg-brand text-white py-20 relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
             <motion.div
               initial={{ opacity: 0, x: -24 }}
@@ -71,10 +79,10 @@ export default function Home() {
               <h1 className="text-5xl font-bold mb-4">Shop with Confidence</h1>
               <p className="text-xl mb-6">Beautiful products, great prices, and seamless checkout.</p>
               <div className="flex items-center justify-center md:justify-start gap-4">
-                <a href="#products" className="bg-white text-primary px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition">
+                <a href="#products" className="btn-brand px-6 py-3 rounded-lg font-bold hover:opacity-95 transition">
                   Start Shopping
                 </a>
-                <a href="/register" className="bg-transparent border border-white px-6 py-3 rounded-lg hover:bg-white/10 transition">
+                <a href="/register" className="bg-white/10 border border-white px-6 py-3 rounded-lg hover:bg-white/20 transition">
                   Create Account
                 </a>
               </div>
