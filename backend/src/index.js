@@ -11,6 +11,7 @@ import storeRoutes from './routes/stores.js';
 import productRoutes from './routes/products.js';
 import cartRoutes from './routes/cart.js';
 import orderRoutes from './routes/orders.js';
+import paymentRoutes from './routes/payments.js';
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use(`/api/${config.apiVersion}/stores`, storeRoutes);
 app.use(`/api/${config.apiVersion}/stores`, productRoutes);
 app.use(`/api/${config.apiVersion}/cart`, cartRoutes);
 app.use(`/api/${config.apiVersion}/orders`, orderRoutes);
+app.use(`/api/${config.apiVersion}/payments`, paymentRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

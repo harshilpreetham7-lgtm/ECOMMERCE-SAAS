@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Home from './pages/Home.jsx';
+import Products from './pages/Products.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Cart from './pages/Cart.jsx';
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/products" element={<Products />} />
         <Route path="/cart" element={<Cart />} />
         
         {/* Protected Customer Routes */}

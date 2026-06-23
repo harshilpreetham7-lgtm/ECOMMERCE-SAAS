@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
 
-export default function ProductCard({ product, onAddToCart }) {
+export default function ProductCard({ product, onAddToCart, onView }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -42,17 +42,25 @@ export default function ProductCard({ product, onAddToCart }) {
           )}
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <span className={`text-sm ${product.stock > 0 ? 'text-success' : 'text-danger'}`}>
             {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
           </span>
-          <button
-            onClick={() => onAddToCart(product)}
-            disabled={product.stock === 0}
-            className="bg-primary text-white px-3 py-2 rounded-lg hover:bg-secondary transition disabled:opacity-50 flex items-center gap-2"
-          >
-            <ShoppingCart className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onView?.(product)}
+              className="px-3 py-1 border border-gray-200 rounded-md hover:bg-gray-50"
+            >
+              View
+            </button>
+            <button
+              onClick={() => onAddToCart(product)}
+              disabled={product.stock === 0}
+              className="bg-primary text-white px-3 py-2 rounded-lg hover:bg-secondary transition disabled:opacity-50 flex items-center gap-2"
+            >
+              <ShoppingCart className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>
