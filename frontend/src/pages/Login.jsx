@@ -20,8 +20,24 @@ export default function Login() {
 
     try {
       const response = await authService.login(formData);
-      dispatch(loginSuccess(response));
-      navigate(response.user.role === 'vendor' ? '/vendor/dashboard' : '/');
+      // Normalize response shape (some APIs wrap in `data`)
+      const payload = response && response.data ? response.data : response;
+      const user = payload.user || payload?.data?.user;
+      const token = payload.token || payload?.data?.token;
+
+      if (!user || !token) {
+        throw new Error('Invalid login response from server');
+      }
+
+      dispatch(loginSuccess({ user, token }));
+      // Ensure redirect happens; use navigate but fallback to full reload if PrivateRoute blocks unexpectedly
+      const target = user.role === 'vendor' ? '/vendor/dashboard' : '/';
+      try {
+        navigate(target);
+      } catch (navErr) {
+        // Fallback: force browser navigation
+        window.location.href = target;
+      }
     } catch (err) {
       const message = err.message || 'Login failed';
       setErrorMsg(message);
