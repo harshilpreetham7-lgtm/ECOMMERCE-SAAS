@@ -5,6 +5,12 @@ import { orderService, cartService } from '../services/index.js';
 import { clearCart } from '../store/slices/cartSlice.js';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
+import api from '../services/api.js';
+
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
 export default function Checkout() {
   const dispatch = useDispatch();
@@ -43,6 +49,16 @@ export default function Checkout() {
     setLoading(true);
 
     try {
+      // If card payment, handle via Stripe Elements
+      if (paymentMethod === 'card') {
+        // Payment handled separately in PaymentForm component
+        // trigger order creation after payment confirmed there
+        alert('Please use the card form below to complete payment.');
+        setLoading(false);
+        return;
+      }
+
+      // For other methods (upi/cod) create order directly
       await orderService.createOrder({
         shippingAddress,
         paymentMethod,
@@ -53,15 +69,7 @@ export default function Checkout() {
       navigate('/orders');
     } catch (error) {
       console.error('Checkout failed:', error);
-      // If backend payment fails, prompt a mock success to allow demo
-      const ok = window.confirm('Payment service unavailable — simulate successful payment for demo?');
-      if (ok) {
-        dispatch(clearCart());
-        alert('Demo order placed successfully!');
-        navigate('/orders');
-      } else {
-        alert('Checkout failed. Please try again.');
-      }
+      alert('Checkout failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -192,6 +200,24 @@ export default function Checkout() {
                     </label>
                   </div>
                 </div>
+                {/* Stripe Elements wrapper for card payments */}
+                <div className="mt-6">
+                  {import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ? (
+                    <Elements stripe={stripePromise}>
+                      <CardPaymentForm
+                        total={total}
+                        shippingAddress={shippingAddress}
+                        onSuccess={async () => {
+                          dispatch(clearCart());
+                          alert('Payment successful and order placed!');
+                          navigate('/orders');
+                        }}
+                      />
+                    </Elements>
+                  ) : (
+                    <div className="text-sm text-gray-500">To enable real card payments set `VITE_STRIPE_PUBLISHABLE_KEY` in your frontend env.</div>
+                  )}
+                </div>
 
                 <button
                   type="submit"
@@ -237,5 +263,58 @@ export default function Checkout() {
       </div>
       <Footer />
     </>
+  );
+}
+
+function CardPaymentForm({ total = 0, shippingAddress = {}, onSuccess }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [processing, setProcessing] = useState(false);
+
+  const handleCardPayment = async (e) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setProcessing(true);
+    try {
+      // Create PaymentIntent on server
+      const resp = await api.post('/payments/create-intent', { amount: Math.round((total || 0) * 100), currency: 'usd' });
+      const clientSecret = resp.clientSecret;
+
+      const card = elements.getElement(CardElement);
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card,
+          billing_details: {
+            name: shippingAddress.name || 'Customer',
+          },
+        },
+      });
+
+      if (result.error) {
+        alert(result.error.message || 'Payment failed');
+      } else if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+        // Create order in backend
+        await orderService.createOrder({ shippingAddress, paymentMethod: 'card', paymentIntentId: result.paymentIntent.id });
+        onSuccess?.();
+      }
+    } catch (err) {
+      console.error('Payment error', err);
+      alert('Payment failed. Check console for details.');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleCardPayment} className="bg-white p-4 rounded shadow">
+      <label className="block mb-2">Card details</label>
+      <div className="border border-gray-200 p-3 rounded mb-4">
+        <CardElement />
+      </div>
+      <button type="submit" disabled={!stripe || processing} className="bg-primary text-white px-4 py-2 rounded">
+        {processing ? 'Processing...' : `Pay $${(total || 0).toFixed(2)}`}
+      </button>
+    </form>
   );
 }
