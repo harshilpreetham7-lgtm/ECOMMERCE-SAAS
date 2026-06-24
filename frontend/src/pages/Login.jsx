@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess, setLoading, setError } from '../store/slices/authSlice.js';
 import { authService } from '../services/index.js';
@@ -20,26 +20,24 @@ export default function Login() {
 
     try {
       const response = await authService.login(formData);
-      // Normalize response shape (some APIs wrap in `data`)
       const payload = response && response.data ? response.data : response;
       const user = payload.user || payload?.data?.user;
       const token = payload.token || payload?.data?.token;
+      const refreshToken = payload.refreshToken || payload?.data?.refreshToken;
 
       if (!user || !token) {
         throw new Error('Invalid login response from server');
       }
 
-      dispatch(loginSuccess({ user, token }));
-      // Ensure redirect happens; use navigate but fallback to full reload if PrivateRoute blocks unexpectedly
+      dispatch(loginSuccess({ user, token, refreshToken }));
       const target = user.role === 'vendor' ? '/vendor/dashboard' : '/';
       try {
         navigate(target);
       } catch (navErr) {
-        // Fallback: force browser navigation
         window.location.href = target;
       }
     } catch (err) {
-      const message = err.message || 'Login failed';
+      const message = err.response?.message || err.message || 'Login failed';
       setErrorMsg(message);
       dispatch(setError(message));
     } finally {
@@ -91,9 +89,14 @@ export default function Login() {
 
         <p className="text-center mt-4">
           Don't have an account?{' '}
-          <a href="/register" className="text-primary hover:underline">
+          <Link to="/register" className="text-primary hover:underline">
             Register here
-          </a>
+          </Link>
+        </p>
+        <p className="text-center mt-2">
+          <Link to="/forgot-password" className="text-primary hover:underline">
+            Forgot your password?
+          </Link>
         </p>
       </div>
     </div>

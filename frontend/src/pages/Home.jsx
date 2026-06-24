@@ -56,88 +56,113 @@ export default function Home() {
   const categories = ['all', ...new Set(products.map((p) => p.category).filter(Boolean))];
 
   const filteredProducts = selectedCategory === 'all' ? products : products.filter((p) => p.category === selectedCategory);
+  const displayProducts = filteredProducts.slice(0, 16);
 
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50">
-        {/* Deals strip */}
+      <div className="min-h-screen bg-slate-50">
+        <section className="relative overflow-hidden bg-gradient-to-r from-brand to-sky-500 text-white py-20">
+          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.25),_transparent_35%)]" />
+          <div className="max-w-7xl mx-auto px-4 relative z-10 flex flex-col gap-10 lg:flex-row lg:items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
+              className="flex-1"
+            >
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+                Flipkart-inspired marketplace
+              </span>
+              <h1 className="mt-6 text-5xl md:text-6xl font-bold leading-tight">
+                Discover top deals and premium products with a modern shopping experience.
+              </h1>
+              <p className="mt-6 max-w-xl text-lg text-white/90">
+                Shop fast-moving categories, curated deals, and best-selling products with smooth animations and an elegant layout that feels premium.
+              </p>
+
+              <div className="mt-10 flex flex-col sm:flex-row items-stretch gap-4 sm:items-center">
+                <a href="#products" className="btn-brand px-6 py-3 rounded-lg font-semibold shadow-lg shadow-brand/30 text-center">
+                  Start Shopping
+                </a>
+                <a href="#deals" className="inline-flex items-center justify-center rounded-lg border border-white/40 bg-white/10 px-6 py-3 text-white transition hover:bg-white/20">
+                  View top deals
+                </a>
+              </div>
+
+              <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="rounded-2xl bg-white/10 p-5">
+                  <p className="text-3xl font-bold">24k+</p>
+                  <p className="mt-2 text-sm text-white/80">Products listed</p>
+                </div>
+                <div className="rounded-2xl bg-white/10 p-5">
+                  <p className="text-3xl font-bold">99.9%</p>
+                  <p className="mt-2 text-sm text-white/80">Delivery on time</p>
+                </div>
+                <div className="rounded-2xl bg-white/10 p-5">
+                  <p className="text-3xl font-bold">4.9/5</p>
+                  <p className="mt-2 text-sm text-white/80">Customer satisfaction</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.9, ease: 'easeOut' }}
+              className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3"
+            >
+              {fallbackProducts.slice(0, 6).map((product, index) => (
+                <div key={product._id} className="overflow-hidden rounded-3xl bg-white/90 shadow-2xl shadow-slate-900/10">
+                  <img src={product.images[0].url} alt={product.name} className="h-44 w-full object-cover" />
+                  <div className="p-4">
+                    <p className="text-xs uppercase tracking-[0.35em] text-slate-500">Featured</p>
+                    <h3 className="mt-3 text-lg font-semibold text-slate-900 line-clamp-2">{product.name}</h3>
+                    <div className="mt-4 flex items-center justify-between gap-3">
+                      <span className="text-xl font-bold text-brand">${product.price}</span>
+                      <span className="rounded-full bg-brand/10 px-3 py-1 text-sm font-semibold text-brand">{product.discount}% OFF</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
         <div className="bg-brand text-white py-2">
-          <div className="max-w-7xl mx-auto px-4 flex items-center justify-between text-sm">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col gap-2 sm:flex-row items-center justify-between text-sm">
             <div>Free delivery on orders above $49 • 30-day returns</div>
             <div>Big Summer Sale — Up to 60% off on selected items</div>
           </div>
         </div>
 
-        {/* Deals carousel */}
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <DealsCarousel deals={products.slice(0, 8)} />
-        </div>
-
-        {/* Hero Section */}
-        <section className="bg-brand text-white py-20 relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
-            <motion.div
-              initial={{ opacity: 0, x: -24 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.85, ease: 'easeInOut' }}
-              className="flex-1 text-center md:text-left"
-            >
-              <h1 className="text-5xl font-bold mb-4">Shop with Confidence</h1>
-              <p className="text-xl mb-6">Beautiful products, great prices, and seamless checkout.</p>
-              <div className="flex items-center justify-center md:justify-start gap-4">
-                <a href="#products" className="btn-brand px-6 py-3 rounded-lg font-bold hover:opacity-95 transition">
-                  Start Shopping
-                </a>
-                <a href="/register" className="bg-white/10 border border-white px-6 py-3 rounded-lg hover:bg-white/20 transition">
-                  Create Account
-                </a>
-              </div>
-            </motion.div>
-
-            <div className="flex-1 hidden md:flex items-center justify-center relative">
-              <motion.div
-                initial={{ scale: 0.92, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.95, ease: 'anticipate' }}
-                className="w-72 h-48 rounded-lg overflow-hidden shadow-2xl bg-white"
-              >
-                <img src={fallbackProducts[0].images[0].url} alt="hero-product-1" className="w-full h-full object-cover" />
-              </motion.div>
-
-              <motion.div
-                initial={{ x: 48, y: -24, opacity: 0 }}
-                animate={{ x: 8, y: -8, opacity: 1 }}
-                transition={{ duration: 1.0, ease: 'easeOut' }}
-                className="w-56 h-40 rounded-lg overflow-hidden shadow-lg absolute right-32 top-8 bg-white"
-              >
-                <img src={fallbackProducts[1].images[0].url} alt="hero-product-2" className="w-full h-full object-cover" />
-              </motion.div>
-
-              <motion.div
-                initial={{ x: -48, y: 24, opacity: 0 }}
-                animate={{ x: -8, y: 8, opacity: 1 }}
-                transition={{ duration: 1.15, ease: 'easeOut' }}
-                className="w-48 h-36 rounded-lg overflow-hidden shadow-lg absolute left-28 bottom-6 bg-white"
-              >
-                <img src={fallbackProducts[2].images[0].url} alt="hero-product-3" className="w-full h-full object-cover" />
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
         <FeaturedCategories categories={categories.filter((c) => c !== 'all')} />
 
-        {/* Product Carousel + Filters */}
-        <section id="products" className="max-w-7xl mx-auto px-4 py-20">
-          <div className="flex flex-col lg:flex-row items-start justify-between gap-6 mb-8">
-            <h2 className="text-3xl font-bold">Featured Products</h2>
-            <div className="flex items-center gap-3">
+        <section id="deals" className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <div>
+              <p className="text-sm uppercase tracking-[0.35em] text-brand font-semibold">Hot Picks</p>
+              <h2 className="text-3xl font-bold">Deals of the Day</h2>
+            </div>
+          </div>
+          <DealsCarousel deals={products.slice(0, 10)} />
+        </section>
+
+        <section id="products" className="max-w-7xl mx-auto px-4 py-10">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-8">
+            <div>
+              <p className="text-sm uppercase tracking-[0.35em] text-brand font-semibold">Shop all</p>
+              <h2 className="text-3xl font-bold">Browse Products</h2>
+            </div>
+            <div className="flex flex-wrap gap-3">
               {categories.map((c) => (
                 <button
                   key={c}
                   onClick={() => setSelectedCategory(c)}
-                  className={`px-3 py-1 rounded-md ${selectedCategory === c ? 'bg-primary text-white' : 'bg-gray-100'}`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                    selectedCategory === c ? 'bg-brand text-white shadow-lg shadow-brand/20' : 'bg-white text-slate-700 border border-slate-200'
+                  }`}
                 >
                   {c}
                 </button>
@@ -145,41 +170,36 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mb-8">
-            <ProductCarousel products={products.slice(0, 8)} />
-          </div>
-
           {loading ? (
-            <div className="text-center py-20">
-              <p className="text-gray-500">Loading products...</p>
+            <div className="text-center py-24">
+              <p className="text-slate-500">Loading products...</p>
             </div>
           ) : products.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-gray-500">No products available</p>
+            <div className="text-center py-24">
+              <p className="text-slate-500">No products available</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {products.map((product) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+              {displayProducts.map((product) => (
                 <ProductCard key={product._id} product={product} onAddToCart={handleAddToCart} />
               ))}
             </div>
           )}
         </section>
 
-        {/* Stats Section */}
         <section className="bg-white py-20 border-t">
           <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
-              <h3 className="text-4xl font-bold text-primary mb-2">1000+</h3>
-              <p className="text-gray-600">Products</p>
+              <h3 className="text-4xl font-bold text-brand mb-2">1000+</h3>
+              <p className="text-slate-500">Products</p>
             </div>
             <div>
-              <h3 className="text-4xl font-bold text-primary mb-2">500+</h3>
-              <p className="text-gray-600">Vendors</p>
+              <h3 className="text-4xl font-bold text-brand mb-2">500+</h3>
+              <p className="text-slate-500">Vendors</p>
             </div>
             <div>
-              <h3 className="text-4xl font-bold text-primary mb-2">10K+</h3>
-              <p className="text-gray-600">Happy Customers</p>
+              <h3 className="text-4xl font-bold text-brand mb-2">10K+</h3>
+              <p className="text-slate-500">Happy Customers</p>
             </div>
           </div>
         </section>

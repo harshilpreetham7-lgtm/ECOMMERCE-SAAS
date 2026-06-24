@@ -5,6 +5,8 @@ import { ShoppingCart } from 'lucide-react';
 export default function ProductCard({ product, onAddToCart, onView }) {
   const images = (product.images && product.images.length > 0) ? product.images : [{ url: 'https://via.placeholder.com/600x400?text=No+Image' }];
   const [idx, setIdx] = useState(0);
+  const isBestSeller = (product.rating || 0) >= 4.5;
+  const isLimitedStock = product.stock > 0 && product.stock <= 20;
 
   useEffect(() => {
     if (!images || images.length <= 1) return;
@@ -35,9 +37,23 @@ export default function ProductCard({ product, onAddToCart, onView }) {
         {product.discount > 0 && (
           <div className="absolute top-2 left-2 bg-accent text-white px-2 py-1 rounded text-sm font-semibold">-{product.discount}%</div>
         )}
+
+        <div className="absolute top-2 right-2 flex flex-col gap-2">
+          {isBestSeller && (
+            <div className="bg-yellow-400 text-slate-900 px-2 py-1 rounded text-[11px] font-bold uppercase tracking-[0.08em] shadow-sm">
+              Best Seller
+            </div>
+          )}
+          {isLimitedStock && (
+            <div className="bg-red-500 text-white px-2 py-1 rounded text-[11px] font-bold uppercase tracking-[0.08em] shadow-sm">
+              Limited stock
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="p-4">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-brand font-semibold mb-2">{product.category}</p>
         <h3 className="font-semibold text-lg mb-2 line-clamp-2">{product.name}</h3>
         <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
 
@@ -70,6 +86,12 @@ export default function ProductCard({ product, onAddToCart, onView }) {
             >
               View
             </button>
+            <a
+              href={`/products/${product._id}`}
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
+            >
+              Details
+            </a>
             <button
               onClick={() => onAddToCart(product)}
               disabled={product.stock === 0}

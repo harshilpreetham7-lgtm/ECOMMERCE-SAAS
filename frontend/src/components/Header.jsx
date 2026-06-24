@@ -1,17 +1,24 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ShoppingCart, User, LogOut, Menu, X, Search } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import { logout } from '../store/slices/authSlice.js';
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState('flipkart');
+  const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.auth);
   const { items } = useSelector((state) => state.cart);
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [showMega, setShowMega] = useState(false);
   const searchRef = useRef();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/login');
+  };
 
   useEffect(() => {
     const stored = localStorage.getItem('site-theme');
@@ -109,8 +116,9 @@ export default function Header() {
                 <User className="w-5 h-5" />
                 <span>{user?.name}</span>
               </div>
-              <button className="text-danger hover:text-red-700">
+              <button onClick={handleLogout} className="text-danger hover:text-red-700 flex items-center gap-2">
                 <LogOut className="w-5 h-5" />
+                Logout
               </button>
             </>
           ) : (

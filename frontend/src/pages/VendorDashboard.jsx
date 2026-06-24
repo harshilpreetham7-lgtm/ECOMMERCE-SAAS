@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { orderService, storeService } from '../services/index.js';
+import { connectSocket } from '../services/socket.js';
+import { useToast } from '../components/ToastProvider.jsx';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
@@ -12,7 +14,15 @@ export default function VendorDashboard() {
   const [stats, setStats] = useState(null);
   const [orders, setOrders] = useState([]);
   const [store, setStore] = useState(null);
+  const [theme, setTheme] = useState({
+    primaryColor: '#2874f0',
+    accentColor: '#ffcc00',
+    backgroundColor: '#ffffff',
+    fontFamily: 'Inter, system-ui, sans-serif',
+  });
+  const [liveSales, setLiveSales] = useState([]);
   const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
   if (!token || user?.role !== 'vendor') {
     navigate('/login');
@@ -31,6 +41,9 @@ export default function VendorDashboard() {
         setStats(statsRes.stats);
         setOrders(ordersRes.orders);
         setStore(storeRes.store);
+        if (storeRes.store?.theme) {
+          setTheme(storeRes.store.theme);
+        }
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
       } finally {
@@ -41,9 +54,41 @@ export default function VendorDashboard() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (!token) return;
+
+    const socket = connectSocket(token, (event, payload) => {
+      if (event === 'vendor-sale' || event === 'live-sale') {
+        setLiveSales((current) => [payload, ...current].slice(0, 6));
+        toast.addToast(`New sale: ${payload.storeName} - $${payload.total.toFixed(2)}`, 'success');
+      }
+    });
+
+    socket.on('connect', () => {
+      socket.emit('joinRoom', `vendor:${user.id}`);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [token, user, toast]);
+
   if (loading) {
     return <div className="text-center py-20">Loading dashboard...</div>;
   }
+
+  const handleThemeChange = (field, value) => {
+    setTheme((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleSaveTheme = async () => {
+    try {
+      await storeService.updateStore(store._id, { theme });
+      toast.addToast('Store theme updated successfully', 'success');
+    } catch (err) {
+      toast.addToast('Failed to save theme settings', 'danger');
+    }
+  };
 
   return (
     <>
@@ -96,6 +141,82 @@ export default function VendorDashboard() {
               </div>
             </div>
           )}
+
+          {/* Branding & Theme Builder */}
+          {store && (
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold">Theme Builder</h2>
+                <button
+                  type="button"
+                  onClick={handleSaveTheme}
+                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition"
+                >
+                  Save Theme
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label className="block">
+                  <span className="text-gray-600">Primary Color</span>
+                  <input
+                    type="color"
+                    value={theme.primaryColor}
+                    onChange={(e) => handleThemeChange('primaryColor', e.target.value)}
+                    className="mt-2 h-12 w-full rounded-lg border px-3 py-2"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-gray-600">Accent Color</span>
+                  <input
+                    type="color"
+                    value={theme.accentColor}
+                    onChange={(e) => handleThemeChange('accentColor', e.target.value)}
+                    className="mt-2 h-12 w-full rounded-lg border px-3 py-2"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-gray-600">Background Color</span>
+                  <input
+                    type="color"
+                    value={theme.backgroundColor}
+                    onChange={(e) => handleThemeChange('backgroundColor', e.target.value)}
+                    className="mt-2 h-12 w-full rounded-lg border px-3 py-2"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-gray-600">Font Family</span>
+                  <input
+                    type="text"
+                    value={theme.fontFamily}
+                    onChange={(e) => handleThemeChange('fontFamily', e.target.value)}
+                    className="mt-2 h-12 w-full rounded-lg border px-3 py-2"
+                  />
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* Live sales */}
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold">Live Sales Feed</h2>
+              <span className="text-sm text-gray-500">Real-time updates powered by Socket.io</span>
+            </div>
+            {liveSales.length === 0 ? (
+              <p className="text-gray-600">Waiting for new sales...</p>
+            ) : (
+              <div className="space-y-3">
+                {liveSales.map((sale, index) => (
+                  <div key={`${sale.orderNumber}-${index}`} className="rounded-xl border border-slate-200 p-4 bg-slate-50">
+                    <p className="font-semibold">{sale.storeName} received a sale</p>
+                    <p className="text-sm text-gray-600">Amount: ${sale.total.toFixed(2)}</p>
+                    <p className="text-sm text-gray-600">Customer: {sale.customerName}</p>
+                    <p className="text-xs text-gray-500">{new Date(sale.createdAt).toLocaleString()}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Recent Orders */}
           <div className="bg-white rounded-lg shadow-md p-6">
