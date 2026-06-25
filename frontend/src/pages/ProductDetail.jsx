@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Heart, Plus, Minus } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from '../components/Header.jsx';
@@ -18,6 +19,8 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [related, setRelated] = useState([]);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [wishlist, setWishlist] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -52,7 +55,14 @@ export default function ProductDetail() {
       alert('Unable to add to cart');
     }
   };
+  const savings = useMemo(() => {
+  if (!product?.originalPrice) return 0;
 
+  return (
+    (product.originalPrice - product.price) *
+    quantity
+  );
+}, [product, quantity]);
   const images = useMemo(
     () => (product?.images && product.images.length > 0 ? product.images : [{ url: 'https://via.placeholder.com/900x600?text=No+Image' }]),
     [product]
