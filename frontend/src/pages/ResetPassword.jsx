@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { authService } from '../services/index.js';
 
@@ -8,12 +9,26 @@ export default function ResetPassword() {
   const [status, setStatus] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+const passwordStrength = useMemo(() => {
+  let score = 0;
 
+  if (formData.password.length >= 8) score++;
+  if (/[A-Z]/.test(formData.password)) score++;
+  if (/[0-9]/.test(formData.password)) score++;
+  if (/[^A-Za-z0-9]/.test(formData.password)) score++;
+
+  return score;
+}, [formData.password]);
+
+const passwordsMatch =
+  formData.password === formData.confirmPassword;
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
